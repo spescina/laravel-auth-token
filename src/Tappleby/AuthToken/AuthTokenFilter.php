@@ -13,37 +13,36 @@ use Tappleby\AuthToken\Exceptions\NotAuthorizedException;
 
 class AuthTokenFilter {
 
-  /**
-   * The event dispatcher instance.
-   *
-   * @var \Illuminate\Events\Dispatcher
-   */
-  protected $events;
+	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var \Illuminate\Events\Dispatcher
+	 */
+	protected $events;
 
-  /**
-   * @var \Tappleby\AuthToken\AuthTokenDriver
-   */
-  protected $driver;
+	/**
+	 * @var \Tappleby\AuthToken\AuthTokenDriver
+	 */
+	protected $driver;
 
-  function __construct(AuthTokenDriver $driver, Dispatcher $events)
-  {
-    $this->driver = $driver;
-    $this->events = $events;
-  }
+	function __construct( AuthTokenDriver $driver, Dispatcher $events ) {
+		$this->driver = $driver;
+		$this->events = $events;
+	}
 
-  function filter($route, $request) {
-	  $payload = $request->header('X-Auth-Token');
+	function filter( $route, $request ) {
+		$payload = $request->header( 'X-Auth-Token' );
 
-	  if(empty($payload)) {
-		  $payload = $request->input('auth_token');
-	  }
+		if ( empty( $payload ) ) {
+			$payload = $request->input( 'auth_token' );
+		}
 
-    $user = $this->driver->validate($payload);
+		$user = $this->driver->validate( $payload );
 
-    if(!$user) {
-      throw new NotAuthorizedException();
-    }
+		if ( ! $user ) {
+			throw new NotAuthorizedException();
+		}
 
-    $this->events->fire('auth.token.valid', $user);
-  }
+		$this->events->fire( 'auth.token.valid', $user );
+	}
 }

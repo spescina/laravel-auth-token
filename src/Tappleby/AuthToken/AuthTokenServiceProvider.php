@@ -2,8 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class AuthTokenServiceProvider extends ServiceProvider
-{
+class AuthTokenServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -12,10 +11,9 @@ class AuthTokenServiceProvider extends ServiceProvider
 	 */
 	protected $defer = false;
 
-	public function boot()
-	{
-		$this->package('tappleby/laravel-auth-token');
-		$this->app['router']->filter('auth.token', 'tappleby.auth.token.filter');
+	public function boot() {
+		$this->package( 'tappleby/laravel-auth-token' );
+		$this->app['router']->filter( 'auth.token', 'tappleby.auth.token.filter' );
 	}
 
 
@@ -24,28 +22,27 @@ class AuthTokenServiceProvider extends ServiceProvider
 	 *
 	 * @return void
 	 */
-	public function register()
-	{
+	public function register() {
 		$app = $this->app;
 
-		$app->bindShared('tappleby.auth.token', function ($app) {
-			return new AuthTokenManager($app);
-		});
+		$app->bindShared( 'tappleby.auth.token', function ( $app ) {
+			return new AuthTokenManager( $app );
+		} );
 
-		$app->bindShared('tappleby.auth.token.filter', function ($app) {
+		$app->bindShared( 'tappleby.auth.token.filter', function ( $app ) {
 			$driver = $app['tappleby.auth.token']->driver();
-      $events = $app['events'];
-
-      return new AuthTokenFilter($driver, $events);
-		});
-
-		$app->bind('Tappleby\AuthToken\AuthTokenController', function ($app) {
-			$driver = $app['tappleby.auth.token']->driver();
-			$credsFormatter = $app['config']->get('laravel-auth-token::format_credentials', null);
 			$events = $app['events'];
 
-      return new AuthTokenController($driver, $credsFormatter, $events);
-		});
+			return new AuthTokenFilter( $driver, $events );
+		} );
+
+		$app->bind( 'Tappleby\AuthToken\AuthTokenController', function ( $app ) {
+			$driver         = $app['tappleby.auth.token']->driver();
+			$credsFormatter = $app['config']->get( 'laravel-auth-token::format_credentials', null );
+			$events         = $app['events'];
+
+			return new AuthTokenController( $driver, $credsFormatter, $events );
+		} );
 	}
 
 	/**
@@ -53,9 +50,8 @@ class AuthTokenServiceProvider extends ServiceProvider
 	 *
 	 * @return array
 	 */
-	public function provides()
-	{
-		return array('tappleby.auth.token', 'tappleby.auth.token.filter');
+	public function provides() {
+		return array( 'tappleby.auth.token', 'tappleby.auth.token.filter' );
 	}
 
 }
